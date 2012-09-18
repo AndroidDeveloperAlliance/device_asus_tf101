@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-BOARD_USES_GENERIC_AUDIO := false
+USE_PROPRIETARY_AUDIO_EXTENSIONS := true
 USE_CAMERA_STUB := false
 
 # inherit from the proprietary version
@@ -45,6 +45,8 @@ BOARD_KERNEL_PAGESIZE :=
 # EGL settings
 BOARD_EGL_CFG := device/asus/tf101/prebuilt/egl.cfg
 USE_OPENGL_RENDERER := true
+BOARD_USES_HGL := true
+BOARD_USES_OVERLAY := true
 
 # Misc display settings
 BOARD_USE_SKIA_LCDTEXT := true
@@ -53,6 +55,9 @@ BOARD_NO_ALLOW_DEQUEUE_CURRENT_BUFFER := true
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
+
+#ICS Camera
+COMMON_GLOBAL_CFLAGS += -DICS_CAMERA_BLOB
 
 # Support for dock battery
 TARGET_HAS_DOCK_BATTERY := true
@@ -72,13 +77,22 @@ WIFI_DRIVER_FW_PATH_AP := "/system/vendor/firmware/fw_bcmdhd_apsta.bin"
 # Todo fix these values to the spacific sizes
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 8388608
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 5242880
+# BOARD_RECOVERYIMAGE_PARTITION_SIZE := 5242880
+# Hack this !
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 6242880
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 527433728
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 29850022707
 BOARD_FLASH_BLOCK_SIZE := 4096
 
+# Audio Build Options
+BOARD_USES_GENERIC_AUDIO := false
+BOARD_USES_ALSA_AUDIO := false
+
 # Try to build the kernel
-TARGET_KERNEL_CONFIG := cyanogen_tf101_defconfig
+# TARGET_KERNEL_CONFIG := cyanogen_tf101_defconfig
+
+# Define the kernel source - not needed anymore
+# TARGET_KERNEL_SOURCE := kernel/asus/tf101
 
 # Prebuilt Kernel Fallback
 TARGET_PREBUILT_KERNEL := device/asus/tf101/kernel
@@ -88,8 +102,39 @@ TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := device/asus/tf101/releasetools/tf10
 
 # Recovery Options
 BOARD_CUSTOM_BOOTIMG_MK := device/asus/tf101/recovery/recovery.mk
+TARGET_RECOVERY_INITRC := device/asus/tf101/recovery/init.rc
+# TARGET_RECOVERY_KERNEL := device/asus/tf101/recovery/kernel
+
+# Avoid the generation of ldrcc instructions
+NEED_WORKAROUND_CORTEX_A9_745320 := true
+
+BOARD_MALLOC_ALIGNMENT := 16
+
+# [0] Linaro enhancements are required for the next two :
+
+# Turn on Cortex A9 Optimizations for A7
+TARGET_EXTRA_CFLAGS := $(call cc-option,-mtune=cortex-a9) $(call cc-option,-mcpu=cortex-a9)
+
+# Use Cortex A9 optimizations for A7
+USE_ALL_OPTIMIZED_STRING_FUNCS := true
+
+# [1] Linaro end
+
+# Lid hack - now kernel space !
+# TARGET_USES_TF101_LID_HACK := true
+
+# Support for dock battery
+TARGET_HAS_DOCK_BATTERY := true
+
+# Recovery flags
 BOARD_HAS_NO_MISC_PARTITION := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_HAS_LARGE_FILESYSTEM := true
-TARGET_RECOVERY_INITRC := device/asus/tf101/recovery/init.rc
 BOARD_HAS_SDCARD_INTERNAL := true
+
+BOARD_DATA_FILESYSTEM := ext4
+BOARD_SYSTEM_FILESYSTEM := ext4
+BOARD_CACHE_FILESYSTEM := ext4
+
+# More recovery flags
+TARGET_RECOVERY_PRE_COMMAND := "echo 'boot-recovery' > /dev/block/mmcblk0p3; sync"

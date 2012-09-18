@@ -1,7 +1,7 @@
 # Inherit device configuration for tf101.
 $(call inherit-product, device/asus/tf101/full_tf101.mk)
 
-# Inherit some common cyanogenmod stuff.
+# Inherit some common ada stuff.
 $(call inherit-product, vendor/ada/config/common_full_tablet_wifionly.mk)
 
 #

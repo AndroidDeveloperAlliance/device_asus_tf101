@@ -19,11 +19,11 @@ $(call inherit-product, device/common/gps/gps_us_supl.mk)
 
 $(call inherit-product-if-exists, vendor/asus/tf101/tf101-vendor.mk)
 
-DEVICE_PACKAGE_OVERLAYS += device/asus/tf101/overlay
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 # Prebuilt kernel location
 ifeq ($(TARGET_PREBUILT_KERNEL),)
-	LOCAL_KERNEL := device/asus/tf101/kernel
+	LOCAL_KERNEL := $(LOCAL_PATH)/kernel
 else
 	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
 endif
@@ -35,12 +35,15 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/init.ventana.usb.rc:root/init.ventana.usb.rc \
     $(LOCAL_PATH)/ramdisk/ueventd.ventana.rc:root/ueventd.ventana.rc \
     $(LOCAL_PATH)/ramdisk/init.ventana.keyboard.rc:root/init.ventana.keyboard.rc \
-    $(LOCAL_PATH)/prebuilt/keyswap::root/sbin/keyswap
+    $(LOCAL_PATH)/prebuilt/keyswap::root/sbin/keyswap \
+    $(LOCAL_PATH)/ramdisk/fstab.ventana:root/fstab.ventana
 
 # Prebuilt configeration files
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/asound.conf:system/etc/asound.conf \
     $(LOCAL_PATH)/prebuilt/media_profiles.xml:system/etc/media_profiles.xml \
+    $(LOCAL_PATH)/media_codecs.xml:system/etc/media_codecs.xml \
+    $(LOCAL_PATH)/mixer_paths.xml:system/etc/mixer_paths.xml \
+    $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf \
     $(LOCAL_PATH)/prebuilt/vold.fstab:system/etc/vold.fstab \
     $(LOCAL_PATH)/prebuilt/gps.conf:system/etc/gps.conf \
     $(LOCAL_PATH)/prebuilt/gpsconfig.xml:system/etc/gps/gpsconfig.xml
@@ -60,11 +63,9 @@ $(call inherit-product, $(LOCAL_PATH)/keylayout/l10n/l10n.mk)
 
 # Camera/WiFi/BT Firmware
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/nvram_4329.txt:system/etc/nvram_4329.txt \
+    $(LOCAL_PATH)/prebuilt/wifi/nvram_4329.txt:system/etc/nvram_4329.txt \
     $(LOCAL_PATH)/prebuilt/firmware/BCM4329B1_002.002.023.0797.0863.hcd:system/etc/firmware/BCM4329B1_002.002.023.0797.0863.hcd \
-    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd.bin:system/vendor/firmware/fw_bcmdhd.bin \
-    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd_apsta.bin:system/vendor/firmware/fw_bcmdhd_apsta.bin \
-    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd_p2p.bin:system/vendor/firmware/fw_bcmdhd_p2p.bin
+    $(LOCAL_PATH)/prebuilt/bluetooth/bdaddr:system/etc/bluetooth/bdaddr
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -83,12 +84,42 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
-    packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml \
+    packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
+#    $(LOCAL_PATH)/asusec/com.cyanogenmod.asusec.xml:system/etc/permissions/com.cyanogenmod.asusec.xml
+
+# Modules
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/modules/battery_rvsd.ko:system/lib/modules/battery_rvsd.ko \
+    $(LOCAL_PATH)/prebuilt/modules/scsi_wait_scan.ko:system/lib/modules/scsi_wait_scan.ko \
+    $(LOCAL_PATH)/prebuilt/modules/cifs.ko:system/lib/modules/cifs.ko \
+    $(LOCAL_PATH)/prebuilt/modules/tun.ko:system/lib/modules/tun.ko \
+    $(LOCAL_PATH)/prebuilt/modules/xpad.ko:system/lib/modules/xpad.ko \
+    $(LOCAL_PATH)/prebuilt/modules/ff-memless.ko:system/lib/modules/ff-memless.ko
+
+# Miscellanous
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/bin/wifimacwriter:system/bin/wifimacwriter \
+    $(LOCAL_PATH)/prebuilt/data/srs_processing.cfg:system/data/srs_processing.cfg \
+    $(LOCAL_PATH)/patches/platform.xml:system/etc/permissions/platform.xml
+
+# WiFi
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/wifi/nvram_murata.txt:system/etc/nvram_murata.txt \
+    $(LOCAL_PATH)/prebuilt/wifi/nvram_nh615_sl101.txt:system/etc/nvram_nh615_sl101.txt \
+    $(LOCAL_PATH)/prebuilt/wifi/nvram_nh615.txt:system/etc/nvram_nh615.txt \
+    $(LOCAL_PATH)/prebuilt/wifi/nvram.txt:system/etc/nvram.txt
+
+# Vendor firmware
+PRODUCT_COPY_FILES += \
+    system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf \
+    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd.bin:system/vendor/firmware/fw_bcmdhd.bin \
+    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd_apsta.bin:system/vendor/firmware/fw_bcmdhd_apsta.bin \
+    $(LOCAL_PATH)/prebuilt/firmware/fw_bcmdhd_p2p.bin:system/vendor/firmware/fw_bcmdhd_p2p.bin
 
 # Build characteristics setting 
 PRODUCT_CHARACTERISTICS := tablet
 
-# This device have enough room for precise davick
+# This device have enough room for precise dalvik
 PRODUCT_TAGS += dalvik.gc.type-precise
 
 # Extra packages to build for this device
@@ -101,8 +132,14 @@ PRODUCT_PACKAGES += \
         libaudioutils \
 	libinvensense_mpl \
         blobpack_tf \
-        AutoParts \
-	mischelp
+	mischelp \
+        libaudioutils \
+        tinymix \
+        tinyplay \
+        tinyrec \
+        audio.primary.ventana
+	#com.cyanogenmod.asusec \
+	#libasusec_jni
 
 # Propertys spacific for this device
 PRODUCT_PROPERTY_OVERRIDES := \
@@ -110,14 +147,20 @@ PRODUCT_PROPERTY_OVERRIDES := \
     	wifi.supplicant_scan_interval=15 \
     	ro.opengles.version=131072 \
 	persist.sys.usb.config=mtp,adb \
-	dalvik.vm.dexopt-data-only=1
+	dalvik.vm.dexopt-data-only=1 \
+        ro.sf.lcd_density=160 \
+        ro.wifi.country=EU \
+        ro.carrier=wifi-only
+
+# Inherit tablet dalvik settings
+$(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 
 # Call the vendor to setup propiatory files
 $(call inherit-product-if-exists, vendor/asus/tf101/tf101-vendor.mk)
 
 # Device nameing
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
-PRODUCT_NAME := full_tf101
+PRODUCT_NAME := tf101
 PRODUCT_DEVICE := tf101
 PRODUCT_MODEL := tf101
 PRODUCT_BRAND := asus

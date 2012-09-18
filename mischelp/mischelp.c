@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
         ALOGE("ERROR : Usage : %s <path of misc> <boot command>\n", LOG_TAG);
         return 0;
     } else if (argc == 2) {
-        ALOGI("Erasing boot coommand to partition %s\n", argv[1]);
+        ALOGI("Eraseing boot coommand to partition %s\n", argv[1]);
     } else if (argc == 3) {
         strncpy(bootcom, argv[2], MAX_COM_LENGTH);
-        ALOGI("Writing boot coommand \"%s\" from partition \"%s\"\n", bootcom, argv[1]);
+        ALOGI("Writeing boot coommand \"%s\" from partition \"%s\"\n", bootcom, argv[1]);
     }
 
     FILE *f;

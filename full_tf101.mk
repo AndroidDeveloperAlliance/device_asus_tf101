@@ -31,7 +31,7 @@ $(call inherit-product, device/asus/tf101/device_tf101.mk)
 #$(call inherit-product, device/sample/products/backup_overlay.mk)
 
 # Set those variables here to overwrite the inherited values.
-PRODUCT_NAME := ada_tf101
+PRODUCT_NAME := full_tf101
 PRODUCT_DEVICE := tf101
 PRODUCT_BRAND := asus
-PRODUCT_MODEL := Transformer Prime
+PRODUCT_MODEL := Transformer

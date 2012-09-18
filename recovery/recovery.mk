@@ -1,4 +1,5 @@
 TF_BLOBIFIER := $(HOST_OUT_EXECUTABLES)/blobpack_tf
+PRODUCT_COPY_FILES += $(LOCAL_PATH)/recovery/clear-misc.sh:root/sbin/clear-misc.sh
 
 
 $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) \
